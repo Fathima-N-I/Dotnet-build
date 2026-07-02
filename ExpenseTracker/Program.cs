@@ -6,6 +6,8 @@ ExpenseService service = new ExpenseService();
 
 while (true)
 {
+    Console.WriteLine("Make sure to run the application from the project root directory: \\ExpenseTracker");
+
     Console.WriteLine("Expense Tracker");
     Console.WriteLine("-----------------");
     Console.WriteLine("1. Add Expense");
@@ -28,7 +30,6 @@ while (true)
 
         Expense expense = new Expense
         {
-            Id = new Random().Next(1,1000),
             Category = category,
             Amount = amount,
             Date =  DateTime.Now
@@ -40,15 +41,26 @@ while (true)
 
     else if ( choice == "2")
     {
-        service.ShowExpenses();
+        bool show = service.ShowExpenses();
+        if(!show)
+        {
+            Console.WriteLine("No expenses to show.");
+        }
     }
 
     else if( choice == "3" )
     {
         Console.Write("Enter Expense ID to delete:");
         int id = Convert.ToInt32(Console.ReadLine());
-        service.DeleteExpense(id);
-        Console.WriteLine("Expense deleted");
+        bool deleted = service.DeleteExpense(id);
+        if(deleted)
+        {
+            Console.WriteLine("Expense deleted successfully.");
+        }
+        else
+        {
+            Console.WriteLine("Expense not found.");
+        }
     }
 
     else if (choice == "4")
@@ -58,26 +70,32 @@ while (true)
 
         Console.WriteLine("Enter what to update: 1 for Category and 2 for Amount");
         int updateChoice = Convert.ToInt32(Console.ReadLine());
-
+        bool updated = false;
         if (updateChoice == 1)
         {
             Console.WriteLine("Enter the new category:");
             string category = Console.ReadLine() ?? string.Empty; 
             
-            // Pass the new category, and null for the amount
-            service.UpdateExpense(id, category, null);
+            updated = service.UpdateExpense(id, category, null);
         }
-        else if (updateChoice == 2) // Changed to 'else if' for cleaner logic
+        else if (updateChoice == 2) 
         {
             Console.WriteLine("Enter the new amount:");
             decimal amount = Convert.ToDecimal(Console.ReadLine());
             
-            // Pass null for the category, and the new amount
-            service.UpdateExpense(id, null, amount);
+            updated = service.UpdateExpense(id, null, amount);
         }
         else
         {
             Console.WriteLine("Invalid choice.");
+        }
+        if (updated)
+        {
+            Console.WriteLine("Expense updated");
+        }
+        else
+        {
+            Console.WriteLine("Expense not found.");
         }
     }
 

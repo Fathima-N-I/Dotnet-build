@@ -25,22 +25,24 @@ public class ExpenseService
 
     public void AddExpense(Expense expense)
     {
+        expense.Id = expenses.Count > 0 ? expenses.Max(e => e.Id) + 1 : 1;
         expenses.Add(expense);
         SaveExpenses();
     }
 
-    public void ShowExpenses()
+    public bool ShowExpenses()
     {
         if(expenses.Count == 0)
         {
             Console.WriteLine("No expenses found.");
-            return;
+            return false;
         }
 
         foreach(var expense in expenses)
         {
             Console.WriteLine($"{expense.Id} - {expense.Category} - {expense.Amount}");
         }
+        return true;
     }
 
     public void SaveExpenses()
@@ -53,44 +55,41 @@ public class ExpenseService
             });
         File.WriteAllText(filePath,json);
     }
-    public void DeleteExpense(int id)
+    public bool DeleteExpense(int id)
     {
         var expenseToDelete = expenses.FirstOrDefault(e => e.Id == id);
         if(expenseToDelete != null)
         {
             expenses.Remove(expenseToDelete);
             SaveExpenses();
-            Console.WriteLine($"Expense with ID {id} deleted.");
+            return true;
         }
         else
         {
-            Console.WriteLine($"Expense with ID {id} not found.");
+            return false;
         }
     }
     
-    public void UpdateExpense(int id, string newCategory, decimal? newAmount)
+    public bool UpdateExpense(int id, string? newCategory, decimal? newAmount)
     {
         var expenseToUpdate = expenses.FirstOrDefault(e => e.Id == id);
         if (expenseToUpdate != null)
         {
-            // Only update category if a new one is provided
-            if (newCategory != null)
+            if (!string.IsNullOrWhiteSpace(newCategory))
             {
                 expenseToUpdate.Category = newCategory;
             }
-
-            // Only update amount if a new one is provided
-            if (newAmount.HasValue) // Or: newAmount != null
+            if (newAmount.HasValue) 
             {
                 expenseToUpdate.Amount = newAmount.Value;
             }
 
             SaveExpenses();
-            Console.WriteLine($"Expense with ID {id} updated.");
+            return true;
         }
         else
         {
-            Console.WriteLine($"Expense with ID {id} not found.");
+            return false;
         }
     }
 }
