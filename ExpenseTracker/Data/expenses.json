@@ -4,5 +4,11 @@
     "Category": "Tea",
     "Amount": 12,
     "Date": "2026-07-01T15:23:16.6354359+05:30"
+  },
+  {
+    "Id": 366,
+    "Category": "Chicken Puffs",
+    "Amount": 35,
+    "Date": "2026-07-02T16:54:02.38192+05:30"
   }
 ]

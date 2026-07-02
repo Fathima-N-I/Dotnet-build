@@ -4,6 +4,21 @@ using ExpenseTracker.Services;
 
 ExpenseService service = new ExpenseService();
 
+static void ShowExpenses(List<Expense> expenses)
+{
+    if(expenses.Count == 0)
+    {
+        Console.WriteLine("No expenses found.");
+    }
+    else
+    {
+        foreach (Expense expense in expenses)
+        {
+            Console.WriteLine($"{expense.Id} - {expense.Category} - {expense.Amount} - {expense.Date:d}");
+        }
+    } 
+}
+
 while (true)
 {
     Console.WriteLine("Make sure to run the application from the project root directory: \\ExpenseTracker");
@@ -14,8 +29,11 @@ while (true)
     Console.WriteLine("2. Show Expenses");
     Console.WriteLine("3. Delete Expense");
     Console.WriteLine("4. Update Expense");
-    Console.WriteLine("5. Exit");
-
+    Console.WriteLine("5. Search by Category");
+    Console.WriteLine("6. Show Total Expenses");
+    Console.WriteLine("7. SHows Highest Expense");
+    Console.WriteLine("8. Sort Expenses by Amount");
+    Console.WriteLine("9. Exit");
     Console.WriteLine("Enter your choice:");
 
     string? choice = Console.ReadLine();
@@ -99,7 +117,48 @@ while (true)
         }
     }
 
-    else if( choice == "5" )
+    else if (choice == "5")
+    {
+        Console.Write("Enter Category to filter");
+        string? category = Console.ReadLine();
+
+        if(string.IsNullOrWhiteSpace(category))
+        {
+            Console.WriteLine("Category cannot be empty");
+        }
+        else
+        {
+            ShowExpenses(service.SearchByCategory(category));
+        }
+    }
+
+    else if (choice == "6")
+    {
+        decimal total = service.GetTotalExpenses();
+
+        Console.WriteLine($"Total Expenses: $ {total}");
+    }
+
+    else if (choice == "7")
+    {
+        Expense? highestExpense = service.GetHighestExpense();
+
+        if (highestExpense == null)
+        {
+            Console.WriteLine("No expense found");
+        }
+        else
+        {
+            Console.WriteLine($"{highestExpense.Category} | {highestExpense.Amount} | {highestExpense.Date:d}");
+        }
+    }
+    
+    else if (choice == "8")
+    {
+        ShowExpenses(service.GetExpensesSortedByAmount());
+    }
+
+    else if( choice == "9" )
     {
         break;
     }

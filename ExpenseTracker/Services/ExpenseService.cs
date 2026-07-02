@@ -92,4 +92,32 @@ public class ExpenseService
             return false;
         }
     }
+
+    public decimal GetTotalExpenses()
+    {
+        return expenses.Sum(e => e.Amount);
+    }
+
+    public List<Expense> GetExpensesSortedByAmount()
+    {
+        return expenses
+            .OrderBy(e => e.Amount)
+            .ToList();
+    }
+
+    public Expense? GetHighestExpense()
+    {
+        return expenses
+            .OrderByDescending(e => e.Amount)
+            .FirstOrDefault();
+    }
+
+    public List<Expense> SearchByCategory(string category)
+    {
+        return expenses
+            .Where(e => e.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+
 }
