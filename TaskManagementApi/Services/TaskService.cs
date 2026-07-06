@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using System.Net.NetworkInformation;
 using TaskManagement.Models;
 namespace TaskManagement.Services;
@@ -29,5 +30,28 @@ public class TaskService
     public void AddTask(TaskItem task)
     {
         tasks.Add(task);
+    }
+
+    public bool UpdateTask(int id, TaskItem task)
+    {
+        TaskItem? existingTask = tasks.FirstOrDefault(e=>e.Id == id);
+        if (existingTask == null)
+        {
+            return false;
+        }
+        existingTask.Title = task.Title;
+        existingTask.Completed = task.Completed;
+        return true;
+    }
+
+    public bool DeleteTask(int id)
+    {
+        TaskItem? ToDeleteTask = tasks.FirstOrDefault(e=>e.Id == id);
+        if (ToDeleteTask == null)
+        {
+            return false;
+        }
+        tasks.Remove(ToDeleteTask);
+        return true;
     }
 }

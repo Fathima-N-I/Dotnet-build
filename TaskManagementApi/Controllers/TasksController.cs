@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Models;
 using TaskManagement.Services;
@@ -36,5 +37,27 @@ public class TasksController : ControllerBase
     {
         _service.AddTask(task);
         return Ok(task);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult UpdateTask(int id, TaskItem task)
+    {
+        bool updated = _service.UpdateTask(id, task);
+        if (!updated)
+        {
+            return NotFound();
+        }
+        return Ok(task);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteTask(int id)
+    {
+        bool deleted = _service.DeleteTask(id);
+        if(!deleted)
+        {
+            return NotFound();
+        }
+        return NoContent();
     }
 }
