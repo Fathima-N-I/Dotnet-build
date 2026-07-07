@@ -33,10 +33,14 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddTask(TaskItem task)
+    public IActionResult AddTask(CreateTaskRequest request)
     {
-        _service.AddTask(task);
-        return Ok(task);
+        TaskItem createdTask = _service.AddTask(request);
+        return CreatedAtAction(
+            nameof(GetTaskById),
+            new { id = createdTask.Id},
+            createdTask
+        );
     }
 
     [HttpPut("{id}")]

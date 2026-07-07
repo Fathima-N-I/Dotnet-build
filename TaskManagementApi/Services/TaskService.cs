@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Eventing.Reader;
 using System.Net.NetworkInformation;
 using TaskManagement.Models;
@@ -27,11 +28,16 @@ public class TaskService
         return tasks.FirstOrDefault(e=>e.Id == id);
     }
 
-    public void AddTask(TaskItem task)
+    public TaskItem AddTask(CreateTaskRequest request)
     {
-        tasks.Add(task);
+        int nextId = tasks.Any()? tasks.Max(t=>t.Id)+1 : 1;
+        TaskItem newTask = new();
+        newTask.Id = nextId;
+        newTask.Title = request.Title;
+        newTask.Completed = request.Completed;
+        tasks.Add(newTask);
+        return(newTask);
     }
-
     public bool UpdateTask(int id, TaskItem task)
     {
         TaskItem? existingTask = tasks.FirstOrDefault(e=>e.Id == id);
