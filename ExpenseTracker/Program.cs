@@ -21,7 +21,6 @@ static void ShowExpenses(List<Expense> expenses)
 
 while (true)
 {
-    Console.WriteLine("Make sure to run the application from the project root directory: \\ExpenseTracker");
 
     Console.WriteLine("Expense Tracker");
     Console.WriteLine("-----------------");
