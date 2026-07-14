@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Models;
 using TaskManagement.Services;
@@ -17,14 +16,14 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetTasks()
+    public async Task<IActionResult> GetTasks()
     {
-        return Ok(_service.GetTasks());
+        return Ok(await _service.GetTasks());
     }
     [HttpGet("{id}")]
-    public IActionResult GetTaskById(int id)
+    public async Task<IActionResult> GetTaskById(int id)
     {
-        TaskItem? res = _service.GetTaskById(id);
+        TaskItem? res = await _service.GetTaskById(id);
         if(res == null)
         {
             return NotFound();
@@ -33,9 +32,9 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddTask(CreateTaskRequest request)
+    public async Task<IActionResult> AddTask(CreateTaskRequest request)
     {
-        TaskItem createdTask = _service.AddTask(request);
+        TaskItem createdTask = await _service.AddTask(request);
         return CreatedAtAction(
             nameof(GetTaskById),
             new { id = createdTask.Id},
@@ -44,20 +43,20 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateTask(int id, TaskItem task)
+    public async Task<IActionResult> UpdateTask(int id,UpdateTaskRequest updateTaskRequest)
     {
-        bool updated = _service.UpdateTask(id, task);
+        bool updated = await _service.UpdateTask(id, updateTaskRequest);
         if (!updated)
         {
             return NotFound();
         }
-        return Ok(task);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteTask(int id)
+    public async Task<IActionResult> DeleteTask(int id)
     {
-        bool deleted = _service.DeleteTask(id);
+        bool deleted = await _service.DeleteTask(id);
         if(!deleted)
         {
             return NotFound();

@@ -1,63 +1,59 @@
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Eventing.Reader;
-using System.Net.NetworkInformation;
 using TaskManagement.Models;
+using TaskManagement.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace TaskManagement.Services;
 
 public class TaskService 
 {
-    private List<TaskItem> tasks = new();
+    private readonly AppDbContext _context;
 
-    public TaskService()
+    public TaskService(AppDbContext context)
     {
-        TaskItem ob1 = new TaskItem{ Id = 1, Title  = "Learn C#", Completed = true };
-        TaskItem ob2 = new TaskItem{ Id = 2, Title  = "Learn C#", Completed = false };
-        TaskItem ob3 = new TaskItem{ Id = 3, Title  = "Learn C#", Completed = true };   
-        tasks.Add(ob1);
-        tasks.Add(ob2);
-        tasks.Add(ob3);
+        _context = context;
     }
 
-    public List<TaskItem> GetTasks()
+    public async Task<List<TaskItem>> GetTasks()
     {
-        return tasks;
+        return await _context.Tasks.ToListAsync();
     }
 
-    public TaskItem? GetTaskById(int id)
+    public async Task<TaskItem?> GetTaskById(int id)
     {
-        return tasks.FirstOrDefault(e=>e.Id == id);
+        return await _context.Tasks.FirstOrDefaultAsync(e=>e.Id == id);
     }
 
-    public TaskItem AddTask(CreateTaskRequest request)
+    public async Task<TaskItem> AddTask(CreateTaskRequest request)
     {
-        int nextId = tasks.Any()? tasks.Max(t=>t.Id)+1 : 1;
         TaskItem newTask = new();
-        newTask.Id = nextId;
         newTask.Title = request.Title;
         newTask.Completed = request.Completed;
-        tasks.Add(newTask);
-        return(newTask);
+        await _context.Tasks.AddAsync(newTask);
+        await _context.SaveChangesAsync();
+        return newTask;
     }
-    public bool UpdateTask(int id, TaskItem task)
+    public async Task<bool> UpdateTask(int id, UpdateTaskRequest updateTaskRequest)
     {
-        TaskItem? existingTask = tasks.FirstOrDefault(e=>e.Id == id);
+        TaskItem? existingTask = await _context.Tasks.FirstOrDefaultAsync(e => e.Id == id);
         if (existingTask == null)
         {
             return false;
         }
-        existingTask.Title = task.Title;
-        existingTask.Completed = task.Completed;
+        existingTask.Title = updateTaskRequest.Title;
+        existingTask.Completed = updateTaskRequest.Completed;
+        await _context.SaveChangesAsync();
         return true;
     }
 
-    public bool DeleteTask(int id)
+    public async Task<bool> DeleteTask(int id)
     {
-        TaskItem? ToDeleteTask = tasks.FirstOrDefault(e=>e.Id == id);
-        if (ToDeleteTask == null)
+        TaskItem? toDeleteTask = await _context.Tasks.FirstOrDefaultAsync(e=>e.Id == id);
+        if (toDeleteTask == null)
         {
             return false;
         }
-        tasks.Remove(ToDeleteTask);
+        _context.Tasks.Remove(toDeleteTask);
+        await _context.SaveChangesAsync();
         return true;
     }
 }
