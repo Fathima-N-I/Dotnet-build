@@ -7,8 +7,12 @@ public class ExpenseService
 {
     private List<Expense> expenses = new List<Expense>();
 
-    private String filePath = @"C:\Users\fathi\Desktop\fathima-qe-labs-learn-dotnet\ExpenseTracker\Data\expenses.json";
-
+    private readonly string filePath = Path.Combine(
+        Directory.GetCurrentDirectory(),
+        "Data",
+        "expenses.json"
+    );
+    
     public ExpenseService()
     {
         loadExpense();
