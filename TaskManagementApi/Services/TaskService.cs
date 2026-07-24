@@ -15,12 +15,16 @@ public class TaskService
 
     public async Task<List<TaskItem>> GetTasks()
     {
-        return await _context.Tasks.ToListAsync();
+        return await _context.Tasks
+            .Include(t=>t.Category)
+            .ToListAsync();
     }
 
     public async Task<TaskItem?> GetTaskById(int id)
     {
-        return await _context.Tasks.FirstOrDefaultAsync(e=>e.Id == id);
+        return await _context.Tasks
+            .Include(t=>t.Category)
+            .FirstOrDefaultAsync(e=>e.Id == id);
     }
 
     public async Task<TaskItem> AddTask(CreateTaskRequest request)
