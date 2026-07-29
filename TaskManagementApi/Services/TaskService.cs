@@ -1,6 +1,8 @@
 using TaskManagement.Models;
 using TaskManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.Controllers;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace TaskManagement.Services;
 
@@ -13,25 +15,53 @@ public class TaskService
         _context = context;
     }
 
-    public async Task<List<TaskItem>> GetTasks()
+    public async Task<List<TaskResponse>> GetTasks()
     {
-        return await _context.Tasks
-            .Include(t=>t.Category)
-            .ToListAsync();
+        //return await _context.Tasks
+          //  .Include(t=>t.Category)
+            //.ToListAsync();
+        var response = await _context.Tasks.Select(task => new TaskResponse
+        {
+            Id = task.Id,
+            Title = task.Title,
+            Completed = task.Completed,
+            CategoryName = task.Category==null?"Uncategorized" : task.Category.Name
+        })
+        .ToListAsync();
+        return response;
     }
 
-    public async Task<TaskItem?> GetTaskById(int id)
+    public async Task<TaskResponse?> GetTaskById(int id)
     {
-        return await _context.Tasks
+        TaskItem? tasks = await _context.Tasks
             .Include(t=>t.Category)
             .FirstOrDefaultAsync(e=>e.Id == id);
+        if(tasks == null)
+        {
+            return null;
+        }
+        TaskResponse? taskres = new();
+        taskres.Id = tasks.Id;
+        taskres.Title = tasks.Title;
+        taskres.Completed = tasks.Completed;
+        taskres.CategoryName = tasks.Category?.Name ?? "Uncategorized";
+        return taskres;
     }
 
-    public async Task<TaskItem> AddTask(CreateTaskRequest request)
+    public async Task<TaskItem?> AddTask(CreateTaskRequest request)
     {
         TaskItem newTask = new();
         newTask.Title = request.Title;
         newTask.Completed = request.Completed;
+        newTask.CategoryId = request.CategoryId;
+        if ( newTask.CategoryId != null )
+        {
+            bool exist = await _context.Categories.AnyAsync(e => e.Id == newTask.CategoryId);
+            if(!exist)
+            {
+                return null;
+            }
+        }
         await _context.Tasks.AddAsync(newTask);
         await _context.SaveChangesAsync();
         return newTask;

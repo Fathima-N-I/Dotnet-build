@@ -8,4 +8,5 @@ public class CreateTaskRequest
     [StringLength(100)]
     public string Title {get; set;} = string.Empty;
     public bool Completed {get; set;}
+    public int? CategoryId { get; set; }
 }

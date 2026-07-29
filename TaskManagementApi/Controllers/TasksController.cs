@@ -23,7 +23,7 @@ public class TasksController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTaskById(int id)
     {
-        TaskItem? res = await _service.GetTaskById(id);
+        TaskResponse? res = await _service.GetTaskById(id);
         if(res == null)
         {
             return NotFound();
@@ -34,7 +34,11 @@ public class TasksController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddTask(CreateTaskRequest request)
     {
-        TaskItem createdTask = await _service.AddTask(request);
+        TaskItem? createdTask = await _service.AddTask(request);
+        if(createdTask == null)
+        {
+            return BadRequest();
+        }
         return CreatedAtAction(
             nameof(GetTaskById),
             new { id = createdTask.Id},
