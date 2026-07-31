@@ -1,8 +1,6 @@
 using TaskManagement.Models;
 using TaskManagement.Data;
 using Microsoft.EntityFrameworkCore;
-using TaskManagement.Controllers;
-using Microsoft.AspNetCore.Http.Connections;
 
 namespace TaskManagement.Services;
 
@@ -15,38 +13,56 @@ public class TaskService
         _context = context;
     }
 
-    public async Task<List<TaskResponse>> GetTasks()
+    public async Task<List<TaskResponse>> GetTasks( string? title)
     {
         //return await _context.Tasks
           //  .Include(t=>t.Category)
             //.ToListAsync();
-        var response = await _context.Tasks.Select(task => new TaskResponse
+        if(string.IsNullOrEmpty(title))
         {
-            Id = task.Id,
-            Title = task.Title,
-            Completed = task.Completed,
-            CategoryName = task.Category==null?"Uncategorized" : task.Category.Name
-        })
-        .ToListAsync();
-        return response;
+            var response = await _context.Tasks.Select(task => new TaskResponse
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Completed = task.Completed,
+                CategoryName = task.Category==null?"Uncategorized" : task.Category.Name
+            })
+            .ToListAsync();
+            return response;
+        }
+        else
+        {
+            string lowerTitle = title.ToLower();
+            var responses = await _context.Tasks.Where(t=>t.Title.ToLower() == lowerTitle).
+            Select(task=> new TaskResponse
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Completed = task.Completed,
+                CategoryName = task.Category ==null?"Uncategorized": task.Category.Name
+            })
+            .ToListAsync();
+            return responses;
+        }
     }
 
     public async Task<TaskResponse?> GetTaskById(int id)
     {
-        TaskItem? tasks = await _context.Tasks
+        TaskItem? task = await _context.Tasks
             .Include(t=>t.Category)
             .FirstOrDefaultAsync(e=>e.Id == id);
-        if(tasks == null)
+        if(task == null)
         {
             return null;
         }
-        TaskResponse? taskres = new();
-        taskres.Id = tasks.Id;
-        taskres.Title = tasks.Title;
-        taskres.Completed = tasks.Completed;
-        taskres.CategoryName = tasks.Category?.Name ?? "Uncategorized";
-        return taskres;
+        TaskResponse? taskresponse = new();
+        taskresponse.Id = task.Id;
+        taskresponse.Title = task.Title;
+        taskresponse.Completed = task.Completed;
+        taskresponse.CategoryName = task.Category?.Name ?? "Uncategorized";
+        return taskresponse;
     }
+
 
     public async Task<TaskItem?> AddTask(CreateTaskRequest request)
     {

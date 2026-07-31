@@ -16,9 +16,11 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTasks()
+    public async Task<IActionResult> GetTasks(string? title)
     {
-        return Ok(await _service.GetTasks());
+        List<TaskResponse>? result = await _service.GetTasks(title);
+        return Ok(result);
+
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTaskById(int id)
